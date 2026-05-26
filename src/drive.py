@@ -25,18 +25,29 @@ def upload_html(html: str, filename: str) -> str:
     media = MediaIoBaseUpload(io.BytesIO(content), mimetype="text/html", resumable=False)
     metadata = {"name": filename, "parents": [folder_id]}
 
-    # 같은 날짜 파일이 있으면 덮어쓰기
+    # 같은 날짜 파일이 있으면 덮어쓰기 (공유 드라이브 지원)
     existing = service.files().list(
         q=f"name='{filename}' and '{folder_id}' in parents and trashed=false",
         fields="files(id)",
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
     ).execute().get("files", [])
 
     if existing:
         file_id = existing[0]["id"]
-        service.files().update(fileId=file_id, media_body=media).execute()
+        service.files().update(
+            fileId=file_id,
+            media_body=media,
+            supportsAllDrives=True,
+        ).execute()
         print(f"  Drive 업데이트: {filename}")
         return file_id
     else:
-        file = service.files().create(body=metadata, media_body=media, fields="id").execute()
+        file = service.files().create(
+            body=metadata,
+            media_body=media,
+            fields="id",
+            supportsAllDrives=True,
+        ).execute()
         print(f"  Drive 업로드: {filename}")
         return file["id"]
