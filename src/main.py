@@ -7,7 +7,7 @@ from collector import collect
 from summarizer import summarize_all
 from sheets import append_articles
 from renderer import render
-from drive import upload_html
+from drive import save_html
 
 
 def main():
@@ -24,14 +24,11 @@ def main():
     print("\n[3/4] Google Sheets 저장 중...")
     append_articles(summaries)
 
-    print("\n[4/4] HTML 생성 및 Drive 업로드 중...")
+    print("\n[4/4] HTML 생성 중...")
     html, filename = render(summaries)
-    file_id = upload_html(html, filename)
+    save_html(html, filename)
 
-    print(f"\n=== 완료 ===")
-    print(f"파일명: {filename}")
-    print(f"Drive 파일 ID: {file_id}")
-    print(f"링크: https://drive.google.com/file/d/{file_id}/view")
+    print(f"\n=== 완료: {filename} ===")
 
 
 if __name__ == "__main__":
